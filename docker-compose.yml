@@ -1,72 +1,87 @@
 version: "3"
 services:
   nginx:
-    image: nginx:alpine
+    container_name: service-nginx
+    image: nginx:${NGINX_VERSION}
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_HTTP_HOST_PORT}:80"
+      - "${NGINX_HTTPS_HOST_PORT}:443"
     volumes:
-      - ./www/:/var/www/html/:rw
-      - ./conf/conf.d:/etc/nginx/conf.d/:ro
-      - ./conf/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./log/:/var/log/dnmp/:rw
+      - ${SOURCE_DIR}:/var/www/html/:rw
+      - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
+      - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
+      - ${NGINX_LOG_DIR}:/var/log/nginx/:rw
+    restart: always
     networks:
-      - net-php
+      - default
 
-  php:
-    build: ./php/php72/
-    expose:
-      - "9000"
+  php72:
+    container_name: service-php72
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${PHP72_VERSION}
+        PHP_XDEBUG: ${PHP72_XDEBUG}
+        PHP_SWOOLE: ${PHP72_SWOOLE}
+        PHP_REDIS: ${PHP72_REDIS}
+        REPLACE_SOURCE_LIST: ${REPLACE_SOURCE_LIST}
     volumes:
-      - ./www/:/var/www/html/:rw
-      - ./conf/php.ini:/usr/local/etc/php/php.ini:ro
-      - ./conf/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:rw
-      - ./log/:/var/log/dnmp/:rw
+      - ${SOURCE_DIR}:/var/www/html/:rw
+      - ${PHP72_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+      - ${PHP72_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+    restart: always
+    cap_add:
+      - SYS_PTRACE
     networks:
-      - net-php
-      - net-mysql
-      - net-redis
+      - default
 
   mysql:
-    image: mysql:8.0
+    container_name: mysql-db
+    image: mysql:${MYSQL_VERSION}
     ports:
-      - "3306:3306"
+      - "${MYSQL_HOST_PORT}:3306"
     volumes:
-      - ./conf/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
-      - ./mysql/:/var/lib/mysql/:rw
+      - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
+      - ${MYSQL_DATA_DIR}:/var/lib/mysql/:rw
+    restart: always
     networks:
-      - net-mysql
+      - default
     environment:
-      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
 
   redis:
-    image: redis:4.0
-    networks:
-      - net-redis
+    container_name: redis-db
+    image: redis:${REDIS_VERSION}
     ports:
-      - "6379:6379"
+      - "${REDIS_HOST_PORT}:6379"
+    volumes:
+      - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
+    restart: always
+    entrypoint: ["redis-server", "/etc/redis.conf"]
+    networks:
+      - default
 
   phpmyadmin:
+    container_name: service-phpmyadmin
     image: phpmyadmin/phpmyadmin:latest
     ports:
-      - "8080:80"
+      - "${PHPMYADMIN_HOST_PORT}:80"
     networks:
-      - net-mysql
+      - default
     environment:
       - PMA_HOST=mysql
       - PMA_PORT=3306
 
   phpredisadmin:
+    container_name: service-phpredisadmin
     image: erikdubbelboer/phpredisadmin:latest
     ports:
-      - "8081:80"
+      - "${REDISMYADMIN_HOST_PORT}:80"
     networks:
-      - net-redis
+      - default
     environment:
       - REDIS_1_HOST=redis
       - REDIS_1_PORT=6379
 
 networks:
-  net-php:
-  net-mysql:
-  net-redis:
+  default:
