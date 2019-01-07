@@ -56,7 +56,7 @@ DNMP 项目特点：
 4. 拷贝环境配置文件`.env.sample`为`.env`，启动：
    ```
    $ cd dnmp
-   $ cp .env.sample .env
+   $ cp env.sample .env
    $ docker-compose up
    ```
 5. 在浏览器中访问 `localhost`，会看到类似如下的输出：
