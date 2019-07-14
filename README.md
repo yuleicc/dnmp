@@ -47,7 +47,7 @@ DNMP 项目特点：
 1. 本地安装`git`、`docker`和`docker-compose`。
 2. `clone`项目：
    ```
-   $ git clone https://github.com/leif-yu/dnmp.git
+   $ git clone https://github.com/yuleicc/dnmp.git
    ```
 3. 如果不是`root`用户，还需将当前用户加入`docker`用户组：
    ```
@@ -92,9 +92,6 @@ $ docker-compose up
 127.0.0.1 www.site1.com
 127.0.0.1 www.site2.com
 ```
-
-- Linux 和 Mac 的`hosts`文件位置： `/etc/hosts`
-- Windows 的`hosts`文件位置： `C:\Windows\System32\drivers\etc\hosts`
 
 然后通过浏览器这两个地址就能看到效果，其中：
 
@@ -145,20 +142,7 @@ log-error               = /var/lib/mysql/mysql.error.log
 
 ## 6. 使用 composer
 
-dnmp 默认已经在容器中安装了 composer，使用时先进入容器：
-
-```
-$ docker exec -it dnmp_php_1 /bin/bash
-```
-
-然后进入相应目录，使用 composer：
-
-```
-# cd /var/www/html/site1
-# composer update
-```
-
-因为 composer 依赖于 PHP，所以，是必须在容器里面操作 composer 的。
+在宿主机中自己配置 composer，避免 PHP 容器变得庞大。
 
 ## 7. phpmyadmin 和 phpredisadmin
 
@@ -166,10 +150,10 @@ $ docker exec -it dnmp_php_1 /bin/bash
 
 ### 7.1 phpMyAdmin
 
-phpMyAdmin 容器映射到主机的端口地址是：`8080`，所以主机上访问 phpMyAdmin 的地址是：
+phpMyAdmin 容器映射到主机的端口地址是：`8091`，所以主机上访问 phpMyAdmin 的地址是：
 
 ```
-http://localhost:8071
+http://localhost:8091
 ```
 
 MySQL 连接信息：
@@ -181,10 +165,10 @@ MySQL 连接信息：
 
 ### 7.2 phpRedisAdmin
 
-phpRedisAdmin 容器映射到主机的端口地址是：`8082`，所以主机上访问 phpMyAdmin 的地址是：
+phpRedisAdmin 容器映射到主机的端口地址是：`8092`，所以主机上访问 phpMyAdmin 的地址是：
 
 ```
-http://localhost:8082
+http://localhost:8092
 ```
 
 Redis 连接信息如下：
