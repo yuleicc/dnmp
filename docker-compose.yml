@@ -1,11 +1,11 @@
-version: "3"
+version: '3'
 services:
   nginx:
     container_name: service-nginx
     image: nginx:${NGINX_VERSION}
     ports:
-      - "${NGINX_HTTP_HOST_PORT}:80"
-      - "${NGINX_HTTPS_HOST_PORT}:443"
+      - '${NGINX_HTTP_HOST_PORT}:80'
+      - '${NGINX_HTTPS_HOST_PORT}:443'
     volumes:
       - ${SOURCE_DIR}:/var/www/html/:rw
       - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
@@ -21,14 +21,14 @@ services:
       context: .
       args:
         PHP_VERSION: ${PHP72_VERSION}
-        PHP_XDEBUG: ${PHP72_XDEBUG}
-        PHP_SWOOLE: ${PHP72_SWOOLE}
-        PHP_REDIS: ${PHP72_REDIS}
-        REPLACE_SOURCE_LIST: ${REPLACE_SOURCE_LIST}
+        ALPINE_REPOSITORIES: ${ALPINE_REPOSITORIES}
+        PHP_EXTENSIONS: ${PHP72_EXTENSIONS}
+        MORE_EXTENSION_INSTALLER: php72.sh
     volumes:
       - ${SOURCE_DIR}:/var/www/html/:rw
       - ${PHP72_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
       - ${PHP72_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+      - ${PHP72_LOG_DIR}:/var/log/php
     restart: always
     cap_add:
       - SYS_PTRACE
@@ -39,7 +39,7 @@ services:
     container_name: mysql-db
     image: mysql:${MYSQL_VERSION}
     ports:
-      - "${MYSQL_HOST_PORT}:3306"
+      - '${MYSQL_HOST_PORT}:3306'
     volumes:
       - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
       - ${MYSQL_DATA_DIR}:/var/lib/mysql/:rw
@@ -47,17 +47,17 @@ services:
     networks:
       - default
     environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
 
   redis:
     container_name: redis-db
     image: redis:${REDIS_VERSION}
     ports:
-      - "${REDIS_HOST_PORT}:6379"
+      - '${REDIS_HOST_PORT}:6379'
     volumes:
       - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
     restart: always
-    entrypoint: ["redis-server", "/etc/redis.conf"]
+    entrypoint: ['redis-server', '/etc/redis.conf']
     networks:
       - default
 
@@ -65,7 +65,7 @@ services:
     container_name: service-phpmyadmin
     image: phpmyadmin/phpmyadmin:latest
     ports:
-      - "${PHPMYADMIN_HOST_PORT}:80"
+      - '${PHPMYADMIN_HOST_PORT}:80'
     networks:
       - default
     environment:
@@ -76,7 +76,7 @@ services:
     container_name: service-phpredisadmin
     image: erikdubbelboer/phpredisadmin:latest
     ports:
-      - "${REDISMYADMIN_HOST_PORT}:80"
+      - '${REDISMYADMIN_HOST_PORT}:80'
     networks:
       - default
     environment:
